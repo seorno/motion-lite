@@ -1,0 +1,35 @@
+datasource db { provider = "sqlite"; url = env("DATABASE_URL") }
+generator client { provider = "prisma-client-js" }
+
+model Task {
+  id            String   @id @default(cuid())
+  title         String
+  durationMin   Int
+  priority      Int      @default(3)
+  dueAt         DateTime?
+  earliestStart DateTime?
+  latestFinish  DateTime?
+  fixed         Boolean  @default(false)
+  status        String   @default("todo")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  placements    Placement[]
+}
+
+model Placement {
+  id        String   @id @default(cuid())
+  taskId    String
+  start     DateTime
+  end       DateTime
+  calendarEventId String?
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model UserSettings {
+  id            String   @id @default(cuid())
+  workStartHHMM String   @default("09:00")
+  workEndHHMM   String   @default("18:00")
+  slotMin       Int      @default(30)
+  bufferMin     Int      @default(10)
+  timezone      String   @default("Europe/London")
+}
